@@ -1,0 +1,41 @@
+{
+  "name": "bookmark",
+  "version": "1.0.6",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "test": "node --no-warnings --experimental-strip-types --test tests/bookmarks.test.mjs tests/version.test.cjs",
+    "test:ui": "node tests/ui.mjs",
+    "build:android": "bash ./build-android.sh",
+    "export:web": "expo export --platform web --output-dir dist/web"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "15.0.2",
+    "@noble/hashes": "2.3.0",
+    "expo": "57.0.18",
+    "expo-font": "57.0.1",
+    "expo-sqlite": "57.0.2",
+    "htmlparser2": "10.1.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-web": "0.21.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "playwright": "^1.63.0",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=22.13.0 <23"
+  },
+  "expo": {
+    "autolinking": {
+      "nativeModulesDir": "./modules"
+    }
+  }
+}

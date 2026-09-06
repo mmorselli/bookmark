@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Bookmark",
+    "slug": "bookmark",
+    "version": "1.0.6",
+    "orientation": "landscape",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#090D18",
+    "android": {
+      "package": "it.massimo.streammark",
+      "versionCode": 7,
+      "allowBackup": false,
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.VIBRATE"
+      ]
+    },
+    "plugins": [
+      "expo-sqlite",
+      "./plugins/withTv.js"
+    ],
+    "web": {
+      "name": "Bookmark",
+      "bundler": "metro",
+      "favicon": "./public/favicon.png"
+    },
+    "extra": {
+      "builtAt": "2026-09-05T22:34:20.148Z"
+    }
+  }
+}

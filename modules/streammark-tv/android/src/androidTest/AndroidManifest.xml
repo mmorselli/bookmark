@@ -1,0 +1,25 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application android:label="Bookmark import test">
+    <provider android:name="expo.modules.streammark.HtmlImportTestProvider"
+      android:authorities="it.massimo.bookmark.importtests" android:exported="false" android:grantUriPermissions="true" />
+    <activity android:name="expo.modules.streammark.HtmlPickerTestActivity"
+      android:exported="true" android:label="Bookmark import test">
+      <intent-filter>
+        <action android:name="android.intent.action.GET_CONTENT" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.OPENABLE" />
+        <data android:mimeType="*/*" />
+      </intent-filter>
+    </activity>
+    <activity-alias android:name="expo.modules.streammark.HtmlDocumentPickerTestActivity"
+      android:targetActivity="expo.modules.streammark.HtmlPickerTestActivity"
+      android:exported="true" android:label="Bookmark import test">
+      <intent-filter>
+        <action android:name="android.intent.action.OPEN_DOCUMENT" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.OPENABLE" />
+        <data android:mimeType="*/*" />
+      </intent-filter>
+    </activity-alias>
+  </application>
+</manifest>

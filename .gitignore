@@ -1,1 +1,15 @@
-sample
+sample/*
+!sample/demo.html
+node_modules/
+.expo/
+/android/
+build/
+.gradle/
+.build/
+.cxx/
+dist/
+coverage/
+*.keystore
+*.jks
+.env*
+!.env.example
