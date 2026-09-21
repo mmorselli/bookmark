@@ -57,3 +57,5 @@ if [[ -n "${STREAMMARK_COPY_TO:-}" ]]; then
   mkdir -p "$STREAMMARK_COPY_TO"
   cp "$OUTPUT_APK" "$STREAMMARK_COPY_TO/"
 fi
+mkdir -p /mnt/d/delete
+cp "$OUTPUT_APK" /mnt/d/delete/

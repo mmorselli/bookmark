@@ -54,7 +54,7 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [startupError, setStartupError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
-  const [focus, setFocus] = useState<Focus>({ area: 'toolbar', index: 0 });
+  const [focus, setFocus] = useState<Focus>({ area: 'toolbar', index: 1 });
   const [panel, setPanel] = useState<Panel>(null);
   const [panelIndex, setPanelIndex] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -115,7 +115,7 @@ export default function App() {
   }, [notice, appState]);
   useEffect(() => {
     if (focus.area === 'list' && focus.index >= visible.length) {
-      setFocus(visible.length ? { area: 'list', index: visible.length - 1 } : { area: 'toolbar', index: 0 });
+      setFocus(visible.length ? { area: 'list', index: visible.length - 1 } : { area: 'toolbar', index: 1 });
     }
   }, [visible.length, focus]);
   useEffect(() => {
@@ -174,6 +174,14 @@ export default function App() {
     setBookmarks(rows => rows.map(row => row.id === bookmark.id ? { ...row, seen: 1 } : row));
     setPanel(null);
   });
+  const visitRandomUnseen = () => {
+    const candidates = bookmarks.filter(bookmark => !bookmark.seen && (prefs.showHidden || !bookmark.hidden));
+    if (!candidates.length) {
+      setNotice({ error: false, text: 'Nessun segnalibro da vedere disponibile.' });
+      return;
+    }
+    void visit(candidates[Math.floor(Math.random() * candidates.length)]);
+  };
   const openBookmarkMenu = (bookmark: Bookmark) => {
     setActiveId(bookmark.id); setPanelIndex(0); panelPositions.current = {}; setPanel('bookmark');
   };
@@ -182,6 +190,7 @@ export default function App() {
     if (next === 'browser') void listBrowsers().then(setBrowsers).catch(announceError);
   };
   const toolbar = [
+    { label: 'Casuale', icon: 'shuffle-outline' as IconName, action: visitRandomUnseen },
     { label: 'Importa HTML', icon: 'add-outline' as IconName, action: importFile },
     { label: sorts.find(sort => sort.id === prefs.sort)!.label, icon: 'swap-vertical-outline' as IconName, action: () => showPanel('sort') },
     { label: filters.find(filter => filter.id === prefs.seenFilter)!.label, icon: 'filter-outline' as IconName, action: () => showPanel('filter') },
@@ -275,15 +284,15 @@ export default function App() {
   const toolbarButton = (index: number, mini = false) => {
     const item = toolbar[index];
     const focused = !panel && focus.area === 'toolbar' && focus.index === index;
-    const disabled = (!!busy && index !== 7) || (index === 3 && prefs.fontSize === 20) || (index === 4 && prefs.fontSize === 38);
-    return <Pressable key={index} testID={`toolbar-${index}`} accessibilityLabel={item.label}
+    const disabled = (!!busy && index !== 8) || (index === 4 && prefs.fontSize === 20) || (index === 5 && prefs.fontSize === 38);
+    return <Pressable key={index} testID={`toolbar-${index}`} accessibilityLabel={index === 0 ? 'Apri un segnalibro casuale da vedere' : item.label}
       accessibilityRole="button" accessibilityState={{ disabled, selected: focused }} disabled={disabled}
       onFocus={() => pointerFocus({ area: 'toolbar', index })}
       onPress={() => { pointerFocus({ area: 'toolbar', index }); item.action(); }}
-      style={({ pressed }) => [s.tool, mini && s.miniTool, index === 0 && s.importButton, focused && s.focused, index === 0 && focused && { backgroundColor: c.primary, borderColor: c.text }, pressed && s.pressed, disabled && s.disabled]}>
-      <Icon name={item.icon} size={index === 0 ? 24 : 19} color={index === 0 ? c.background : focused ? c.primary : c.muted} />
-      {!mini && <Text style={[s.toolLabel, compactToolbar && { fontSize: 14 }, index === 0 && s.importText]}>{index === 0 ? 'Importa' : item.label}</Text>}
-      {[1, 2].includes(index) && <Icon name="chevron-down" size={14} />}
+      style={({ pressed }) => [s.tool, mini && s.miniTool, index === 1 && s.importButton, focused && s.focused, index === 1 && focused && { backgroundColor: c.primary, borderColor: c.text }, pressed && s.pressed, disabled && s.disabled]}>
+      <Icon name={item.icon} size={index === 1 ? 24 : 19} color={index === 1 ? c.background : focused ? c.primary : c.muted} />
+      {!mini && <Text style={[s.toolLabel, compactToolbar && { fontSize: 14 }, index === 1 && s.importText]}>{index === 1 ? 'Importa' : item.label}</Text>}
+      {[2, 3].includes(index) && <Icon name="chevron-down" size={14} />}
     </Pressable>;
   };
 
@@ -299,9 +308,9 @@ export default function App() {
   return <View style={s.root}>
     <StatusBar hidden />
     <View testID="appbar" style={[s.toolbar, compactToolbar && { gap: 7 }]}>
-      {toolbarButton(0, iconToolbar)}{toolbarButton(1, iconToolbar)}{toolbarButton(2, iconToolbar)}
-      <View style={s.fontControl}>{toolbarButton(3, true)}<Text accessibilityLabel={`Dimensione testo ${prefs.fontSize}`} style={s.fontLabel}>Aa</Text>{toolbarButton(4, true)}</View>
-      {toolbarButton(5, compactToolbar)}{toolbarButton(6, compactToolbar)}{toolbarButton(7)}
+      {toolbarButton(0, compactToolbar)}{toolbarButton(1, iconToolbar)}{toolbarButton(2, iconToolbar)}{toolbarButton(3, iconToolbar)}
+      <View style={s.fontControl}>{toolbarButton(4, true)}<Text accessibilityLabel={`Dimensione testo ${prefs.fontSize}`} style={s.fontLabel}>Aa</Text>{toolbarButton(5, true)}</View>
+      {toolbarButton(6, compactToolbar)}{toolbarButton(7, compactToolbar)}{toolbarButton(8)}
       <View style={{ flex: 1 }} />
       <View style={{ alignItems: 'flex-end', gap: 2 }}>
       <View testID="bookmark-count" accessibilityLabel={`${visible.length} segnalibri`} style={s.collectionStats}>

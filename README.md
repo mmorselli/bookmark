@@ -9,7 +9,7 @@ Gestore di segnalibri **React Native per Android e Android TV**, realizzato seco
 - Titoli completi a capo, senza ellissi. Le frecce scorrono anche le righe di un titolo più alto dell’area disponibile, prima di passare al successivo.
 - Apertura nel browser di sistema o in un browser scelto per questa app. Il segnalibro viene segnato come visto dopo l’avvio riuscito del browser.
 - Menu contestuale con visto/non visto, valutazione 1–5, nascondi/riattiva e apertura nel browser.
-- Un’unica appbar con importazione, ordine alfabetico crescente, prima importazione decrescente, rating decrescente, filtro tutti/da vedere/già visti, testo da 20 a 38 dp, inclusione dei nascosti, browser, Log, versione e conteggio dei segnalibri visualizzati. Tutto lo spazio sottostante è dedicato all’elenco, senza intestazioni, barra laterale o piè di pagina.
+- Un’unica appbar con apertura casuale di un segnalibro da vedere, importazione, ordine alfabetico crescente, prima importazione decrescente, rating decrescente, filtro tutti/da vedere/già visti, testo da 20 a 38 dp, inclusione dei nascosti, browser, Log, versione e conteggio dei segnalibri visualizzati. L’apertura casuale esclude i segnalibri nascosti, a meno che sia attiva l’opzione per mostrarli. Tutto lo spazio sottostante è dedicato all’elenco, senza intestazioni, barra laterale o piè di pagina.
 - Impostazioni salvate localmente, elenco virtualizzato e supporto a telecomando, tastiera e touch.
 
 I segnalibri nuovi partono come **non visti e non valutati**. Le stelle vuote indicano l’assenza di una valutazione. “Mostra nascosti” include i nascosti nell’elenco, mantenendo il filtro di visione selezionato; per riattivarne uno basta aprirne il menu. Nascondere non elimina i dati e non protegge l’accesso con un PIN.

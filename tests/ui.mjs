@@ -30,7 +30,7 @@ const dismissNotice = async () => {
 };
 const importFile = async file => {
   const chooser = page.waitForEvent('filechooser');
-  await page.getByTestId('toolbar-0').click();
+  await page.getByTestId('toolbar-1').click();
   await (await chooser).setFiles(file);
   await page.getByRole('alert').waitFor();
   await dismissNotice();
@@ -41,8 +41,12 @@ try {
   await page.getByText('Nessun segnalibro', { exact: true }).waitFor({ timeout: 120000 });
   await mkdir('dist/screenshots', { recursive: true });
   await page.screenshot({ path: 'dist/screenshots/empty.png' });
-  const cancelledPicker = page.waitForEvent('filechooser');
   await page.getByTestId('toolbar-0').click();
+  await page.getByRole('alert').waitFor();
+  assert.match(await page.getByRole('alert').textContent(), /Nessun segnalibro da vedere/);
+  await dismissNotice();
+  const cancelledPicker = page.waitForEvent('filechooser');
+  await page.getByTestId('toolbar-1').click();
   const pendingFile = await cancelledPicker;
   await page.keyboard.press('F2');
   await page.getByTestId('log-viewer').waitFor();
@@ -69,7 +73,7 @@ try {
   await importFile('sample/demo.html');
   assert.equal((await dbRows()).length, 6, 'reimport must not duplicate rows');
 
-  await page.getByTestId('toolbar-7').click();
+  await page.getByTestId('toolbar-8').click();
   await page.getByTestId('log-text').waitFor();
   assert.match(await page.getByTestId('log-text').textContent(), /import.picker.return/);
   assert.match(await page.getByTestId('log-text').textContent(), /import.database.complete/);
@@ -83,7 +87,7 @@ try {
   assert.equal(await page.getByTestId('log-viewer').count(), 0);
   await page.reload();
   await page.getByTestId('bookmark-0').waitFor();
-  await page.getByTestId('toolbar-7').click();
+  await page.getByTestId('toolbar-8').click();
   assert.match(await page.getByTestId('log-text').textContent(), /import.database.complete/);
   await page.keyboard.press('Escape');
   // Restore collection focus after checking that logs survive a reload.
@@ -106,8 +110,8 @@ try {
   await page.screenshot({ path: 'dist/screenshots/context-menu.png' });
   await page.keyboard.press('Escape');
 
-  await page.getByTestId('toolbar-4').click(); await settle();
-  await page.getByTestId('toolbar-4').click(); await settle();
+  await page.getByTestId('toolbar-5').click(); await settle();
+  await page.getByTestId('toolbar-5').click(); await settle();
   await page.reload();
   await page.getByTestId('bookmark-0').waitFor();
   assert.ok(await page.getByLabel('Dimensione testo 30').count());
@@ -116,22 +120,22 @@ try {
   await page.getByTestId('action-2').click(); await settle();
   await page.keyboard.press('Escape');
   assert.equal((await dbRows()).filter(b => b.hidden).length, 1);
-  await page.getByTestId('toolbar-5').click(); await settle();
+  await page.getByTestId('toolbar-6').click(); await settle();
   await page.getByText('Nascosto', { exact: true }).first().waitFor();
   await page.getByTestId('menu-0').click();
   await page.getByTestId('action-2').click(); await settle();
   await page.keyboard.press('Escape');
   assert.equal((await dbRows()).filter(b => b.hidden).length, 0);
 
-  await page.getByTestId('toolbar-2').click();
+  await page.getByTestId('toolbar-3').click();
   await page.getByRole('radio', { name: 'Già visti', exact: true }).click(); await settle();
   assert.equal(await rows().count(), 1);
-  await page.getByTestId('toolbar-2').click();
+  await page.getByTestId('toolbar-3').click();
   await page.getByRole('radio', { name: 'Da vedere', exact: true }).click(); await settle();
   assert.equal(await rows().count(), 5);
-  await page.getByTestId('toolbar-2').click();
+  await page.getByTestId('toolbar-3').click();
   await page.getByRole('radio', { name: 'Tutti', exact: true }).click(); await settle();
-  await page.getByTestId('toolbar-1').click();
+  await page.getByTestId('toolbar-2').click();
   await page.getByRole('radio', { name: 'Valutazione', exact: true }).click(); await settle();
   assert.match(await page.getByTestId('bookmark-0').getAttribute('aria-label'), /5 stelle/);
 
@@ -144,6 +148,26 @@ try {
   await page.evaluate(() => { window.open = () => ({ opener: null }); });
   await page.getByTestId('bookmark-1').click(); await settle();
   assert.equal((await dbRows()).filter(b => b.seen).length, 2);
+  const unseenUrls = new Set((await dbRows()).filter(b => !b.seen).map(b => b.url));
+  await page.getByTestId('toolbar-3').click();
+  await page.getByRole('radio', { name: 'Già visti', exact: true }).click();
+  await page.evaluate(() => {
+    window.openedRandomUrls = [];
+    window.open = url => { window.openedRandomUrls.push(url); return { opener: null }; };
+  });
+  const randomVisits = unseenUrls.size;
+  for (let i = 0; i < randomVisits; i++) {
+    await page.getByTestId('toolbar-0').click(); await settle();
+    const opened = await page.evaluate(() => window.openedRandomUrls.at(-1));
+    assert.ok(unseenUrls.delete(opened), 'random opening must choose an unvisited bookmark');
+    assert.equal((await dbRows()).filter(b => b.seen).length, 3 + i);
+  }
+  await page.getByTestId('toolbar-0').click();
+  await page.getByRole('alert').waitFor();
+  assert.match(await page.getByRole('alert').textContent(), /Nessun segnalibro da vedere/);
+  await dismissNotice();
+  await page.getByTestId('toolbar-3').click();
+  await page.getByRole('radio', { name: 'Tutti', exact: true }).click();
   await page.screenshot({ path: 'dist/screenshots/library.png' });
 
   await page.setViewportSize({ width: 960, height: 540 });
@@ -162,7 +186,7 @@ try {
   // Exercise virtualized scrolling with wrapping, variable-height titles.
   const many = Array.from({ length: 160 }, (_, index) => `<DT><A HREF="https://example.org/${index}">Elemento ${String(index).padStart(3, '0')} ${index % 4 === 0 ? 'con un titolo molto lungo che deve andare a capo e restare leggibile per intero sul televisore'.repeat(index === 0 ? 14 : 2) : 'di prova'}</A>`).join('\n');
   await importFile({ name: 'many.html', mimeType: 'text/html', buffer: Buffer.from(`<DL>${many}</DL>`) });
-  await page.getByTestId('toolbar-1').click();
+  await page.getByTestId('toolbar-2').click();
   await page.getByRole('radio', { name: 'Titolo A–Z', exact: true }).click();
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('ArrowDown'); await settle();
